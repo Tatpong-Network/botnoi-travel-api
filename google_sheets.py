@@ -2,7 +2,7 @@ import os
 import requests
 
 # ดึง GAS_URL จาก Environment Variable (หากไม่มีให้ใช้ค่าสำรอง)
-GAS_URL = os.getenv("GAS_URL", "https://script.google.com/macros/s/AKfycbz19bP8c9tSb-6YPVKRYLgQoyYlbY5i3u2xlDW-gujbCI3HON8aEaISVm8UNCR_GNFBVA/exec")
+GAS_URL = os.getenv("GAS_URL")
 
 def save_to_google_sheets(user_id, user_name, user_message):
     """

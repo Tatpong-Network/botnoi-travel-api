@@ -9,8 +9,8 @@ from google_sheets import save_to_google_sheets
 
 app = Flask(__name__)
 
-# ดึง LINE Access Token จาก Environment Variable (หากไม่มีให้ใช้ค่าสำรอง)
-LINE_ACCESS_TOKEN = os.getenv("LINE_ACCESS_TOKEN", "uDBGnZLLvai5KHJ6gRASyJJEdSYWxO7AIQM+3YnN6MDWXT7kti2eEeUZjrIknzdE/f7N4E6FNnK5Ml00xif6RwrWiPOvGgy5gldzxqAPOhFxPLbfXqeNtpB8ni8SpDsOYqvVcTYYk9W8ggdD/n/kUAdB04t89/1O/w1cDnyilFU=")
+# ดึง LINE Access Token จาก Environment Variable ปลอดภัย 100%
+LINE_ACCESS_TOKEN = os.getenv("LINE_ACCESS_TOKEN")
 
 user_states = {}
 
@@ -80,6 +80,7 @@ def webhook():
 
     # 3. Intent: ดูแพ็กเกจทัวร์
     elif user_text in ["ดูแพ็กเกจทัวร์", "Package tour", "ทัวร์"]:
+        user_states[user_id] = None
         messages.append(get_tour_package_flex())
 
     # 4. Intent: ดูสถานที่ท่องเที่ยว
@@ -87,14 +88,60 @@ def webhook():
         user_states[user_id] = None
         messages.append(get_travel_flex_carousel(domain_url))
 
-    # 5. Intent: ซื้อ / สั่งซื้อ / จองทัวร์
+    # 5. Intent: ดูรายละเอียดโปรแกรมเดินทาง (กดจากปุ่ม Flex Message)
+    elif user_text in ["รายละเอียดทัวร์ไทย-จีน", "รายละเอียดทัวร์คุนหมิง"]:
+        user_states[user_id] = None
+        messages.append({
+            "type": "text",
+            "text": (
+                "✈️ **รายละเอียดโปรแกรมทัวร์ ไทย-จีน 2 วัน 3 คืน**\n"
+                "💰 ราคาเริ่มต้น: 11,900 บาท / ท่าน\n\n"
+                "📍 **ไฮไลท์โปรแกรม:**\n"
+                "• วันที่ 1: บินตรงสู่คุนหมิง - เยือนอุทยานป่าหินมหัศจรรย์ - ช้อปปิ้งถนนคนเดินคุนหมิง\n"
+                "• วันที่ 2: เที่ยวชมหุบเขาพระจันทร์สีน้ำเงิน (ลี่เจียง) - วิวทิวทัศน์หิมะและน้ำตกสีฟ้ามรกต\n"
+                "• วันที่ 3: เดินทางกลับประเทศไทยโดยสวัสดิภาพ\n\n"
+                "👉 พิมพ์คำว่า 'จองทัวร์ไทย-จีน 2วัน3คืน' เพื่อสำรองที่นั่งได้เลยค่ะ!"
+            )
+        })
+
+    elif user_text in ["รายละเอียดทัวร์จีน-ลาว", "รายละเอียดทัวร์หลวงพระบาง"]:
+        user_states[user_id] = None
+        messages.append({
+            "type": "text",
+            "text": (
+                "🚆 **รายละเอียดโปรแกรมทัวร์ จีน-ลาว 2 วัน 3 คืน (รถไฟความเร็วสูง)**\n"
+                "💰 ราคาเริ่มต้น: 9,900 บาท / ท่าน\n\n"
+                "📍 **ไฮไลท์โปรแกรม:**\n"
+                "• วันที่ 1: สัมผัสเมืองโบราณสิบสองปันนา (ยูนนาน จีน) - นั่งรถไฟความเร็วสูงสู่ หลวงพระบาง (ลาว)\n"
+                "• วันที่ 2: ตักบาตรข้าวเหนียว - เที่ยวน้ำตกตาดกวางสี - ล่องเรือวังเวียง - ชมพระธาตุหลวง เวียงจันทน์\n"
+                "• วันที่ 3: เดินทางกลับประเทศไทยโดยสวัสดิภาพ\n\n"
+                "👉 พิมพ์คำว่า 'จองทัวร์จีน-ลาว 2วัน3คืน' เพื่อสำรองที่นั่งได้เลยค่ะ!"
+            )
+        })
+
+    elif user_text == "รายละเอียดทัวร์ปักกิ่ง":
+        user_states[user_id] = None
+        messages.append({
+            "type": "text",
+            "text": (
+                "🏯 **รายละเอียดโปรแกรมทัวร์ ปักกิ่ง 2 วัน 3 คืน**\n"
+                "💰 ราคาเริ่มต้น: 12,900 บาท / ท่าน\n\n"
+                "📍 **ไฮไลท์โปรแกรม:**\n"
+                "• วันที่ 1: ตะลุยเมืองปักกิ่ง - ชมความยิ่งใหญ่ของกำแพงเมืองจีน 1 ใน 7 สิ่งมหัศจรรย์ของโลก\n"
+                "• วันที่ 2: เที่ยวพระราชวังต้องห้าม (กู้กง) - เช็คอินจัตุรัสเทียนอันเหมิน\n"
+                "• วันที่ 3: ช้อปปิ้งย่านหวังฝูจิ่ง - เดินทางกลับประเทศไทย\n\n"
+                "👉 พิมพ์คำว่า 'จองทัวร์ปักกิ่ง' เพื่อสำรองที่นั่งได้เลยค่ะ!"
+            )
+        })
+
+    # 6. Intent: ซื้อ / สั่งซื้อ / จองทัวร์
     elif "จองทัวร์" in user_text or "ซื้อ" in user_text or "สั่งซื้อ" in user_text:
         messages.append({
             "type": "text", 
-            "text": f"ขอบคุณค่ะ คุณ {user_name}\nระบบได้บันทึกความสนใจ '{user_text}' เรียบร้อยแล้ว เจ้าหนาที่จะติดต่อกลับเพื่อยืนยันข้อมูลโดยเร็วที่สุดค่ะ"
+            "text": f"ขอบคุณค่ะ คุณ {user_name}\nระบบได้บันทึกความสนใจ '{user_text}' เรียบร้อยแล้ว เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันข้อมูลโดยเร็วที่สุดค่ะ"
         })
 
-    # 6. ประมวลผลแปลภาษาเมื่ออยู่ในโหมดแปล
+    # 7. ประมวลผลแปลภาษาเมื่ออยู่ในโหมดแปล
     elif user_id in user_states and user_states[user_id] == "TH_TO_CN":
         translated = GoogleTranslator(source='th', target='zh-CN').translate(user_text)
         messages.append({"type": "text", "text": f"🇨🇳 คำแปลภาษาจีน:\n{translated}"})
