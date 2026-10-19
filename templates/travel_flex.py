@@ -3,8 +3,8 @@ import requests
 import os
 from deep_translator import GoogleTranslator
 
-# ดึงโมดูล flex_templates และ google_sheets ที่สร้างไว้
-from flex_templates import get_travel_flex_carousel, get_tour_package_flex
+# ดึงโมดูล travel flex และ google_sheets ที่สร้างไว้
+from templates.travel_flex import get_travel_flex_carousel, get_tour_package_flex
 from google_sheets import save_to_google_sheets
 
 app = Flask(__name__)
